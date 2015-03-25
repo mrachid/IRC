@@ -31,6 +31,8 @@
 # define LEAVE "/leave"
 # define DECO "/quit"
 # define LIST "^List"
+# define CO "/connect"
+
 # define SENDER "sender$"
 # define B2C "#B2C"
 # define HEC "#HEC"
@@ -96,9 +98,14 @@ void			display_prompt(void);
 int 			first_msg(char *buff);
 int 			check_list_member(char *buff);
 void			cut_list(char *list, t_ncurse *curs);
-void			action(int client_socket, t_info_client *client);
-void			connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client);
-int				main(int ac, char **av, char **env);
+
+// void			action(int client_socket, t_info_client *client);
+void	action(int client_socket, t_info_client *client, struct sockaddr_in server_info, struct hostent *host_server);
+
+// void			connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client);
+void	connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client, struct hostent *host_server);
+
+
 
 
 void			check_input_client(int ac);

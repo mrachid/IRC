@@ -90,13 +90,15 @@ void	cut_list(char *list, t_ncurse *curs)
 	}
 }
 
-void	action(int client_socket, t_info_client *client)
+void	action(int client_socket, t_info_client *client, struct sockaddr_in server_info, struct hostent *host_server)
 {
 	fd_set			readfds;
 	t_ncurse		*curs;
 	int				y;
 	char			buff[1024];
 	char			**msg;
+	(void)host_server;
+	(void)server_info;
 
 	curs = init_curses();
 	y = 0;
@@ -116,13 +118,16 @@ void	action(int client_socket, t_info_client *client)
 				y = send_mess(y, client_socket, curs, client);
 	        if (FD_ISSET(client_socket, &readfds))
 	        {
+	        	mvwprintw(curs->win_chat, 10, 3, "%s", buff);
 	        	if (recv(client_socket, &buff, 1024, 0) == -1)
 	        		ft_error_i("Error recv", 4);
-	        	// mvwprintw(curs->win_chat, 10, 3, "%s", buff);
 	        	if (first_msg(buff))
 	        		updt_nickname(buff, client);
 				else if (check_cmd_client(buff))
+				{
+					ft_putendl("ca passe!!");
 					exec_cmd_client(buff, client, curs);
+				}
 				else
 				{
 					msg = ft_strsplit(buff, '$');
@@ -144,7 +149,7 @@ void	action(int client_socket, t_info_client *client)
 	}
 }
 
-void	connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client)
+void	connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client, struct hostent *host_server)
 {
 	if ((connect(cli_sock, (const struct sockaddr *)&serv_inf,
 		sizeof(serv_inf))) == -1)
@@ -159,7 +164,7 @@ void	connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *cl
 		GREEN;
 		ft_putendl("Client: Connection to server was etablished");
 		CANCEL;
-		action(cli_sock, client);
+		action(cli_sock, client, serv_inf, host_server);
 	}
 }
 
@@ -188,6 +193,6 @@ int		main(int ac, char **av, char **env)
 	server_info.sin_port = atoi(av[2]);
 	server_info.sin_family = AF_INET;
 	client_socket = create_socket(client_socket);
-	connect_server(client_socket, server_info, client);
+	connect_server(client_socket, server_info, client, host_server);
 	return (0);
 }

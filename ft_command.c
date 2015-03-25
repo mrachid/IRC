@@ -12,6 +12,20 @@
 
 #include "header.h"
 
+
+void	close_and_connect(int client_socket, char *buff, t_lst_member *member)
+{
+
+	if (send(client_socket, buff, ft_strlen(buff), 0) == -1)
+		ft_error_i("Error to send", 1);
+
+	(void)member;
+	//close(client_socket);
+	RED;
+	ft_putendl("salut");
+	CANCEL;
+}
+
 void	exec_cmd_sev(char *buff, int client_socket, t_lst_member *member)
 {
 	char 	**cut;
@@ -34,6 +48,8 @@ void	exec_cmd_sev(char *buff, int client_socket, t_lst_member *member)
 				send_member_lst(client_socket, member);
 			else if (strcmp(cut[0], MSG) == 0)
 			 	send_private_msg(client_socket, buff, member);
+			else if (strcmp(cut[0], CO) == 0)
+			 	close_and_connect(client_socket, buff, member);
 		}
 	}
 }
