@@ -69,7 +69,10 @@ static void		ft_hearts_server(t_irc *irc, t_lst_member *member,
 		if (recv(tmp->socket, &irc->buff, 1024, 0) == -1)
 			ft_error_i("Error to received message", 4);
 		if (check_cmd(irc->buff))
+		{
+			ft_putendl("!!!!!!!!!!!!!!!!!!!!!!!");
 			exec_cmd_sev(irc->buff, tmp->socket, member);			
+		}
 		tmp2 = member;
 		tmp2 = tmp2->next;
 		while ((ft_size_socket(tmp2)) > 0)

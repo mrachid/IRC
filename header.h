@@ -30,9 +30,9 @@
 # define MSG "/msg"
 # define LEAVE "/leave"
 # define DECO "/quit"
-# define LIST "^List"
 # define CO "/connect"
 
+# define LIST "^List"
 # define SENDER "sender$"
 # define B2C "#B2C"
 # define HEC "#HEC"
@@ -87,10 +87,11 @@ typedef		struct s_info_client
 	char				*nickname;
 	char				*channel;
 	int 				socket;
+	char				*str;
 }					t_info_client;
 
 
-int				check_cmd_client(char *buff);
+int				check_cmd_client(char *buff, t_ncurse *curs);
 int				check_cmd(char *buff);
 
 int				create_socket(int client_socket);
@@ -98,14 +99,11 @@ void			display_prompt(void);
 int 			first_msg(char *buff);
 int 			check_list_member(char *buff);
 void			cut_list(char *list, t_ncurse *curs);
-
 // void			action(int client_socket, t_info_client *client);
-void	action(int client_socket, t_info_client *client, struct sockaddr_in server_info, struct hostent *host_server);
+void			action(int client_socket, t_info_client *client, struct sockaddr_in server_info, struct hostent *host_server);
 
 // void			connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client);
 void	connect_server(int cli_sock, struct sockaddr_in serv_inf, t_info_client *client, struct hostent *host_server);
-
-
 
 
 void			check_input_client(int ac);

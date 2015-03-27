@@ -51,20 +51,6 @@ void	env_server(char *buff, int client_socket)
 		ft_error_i("Error send", 1);
 }
 
-// int		check_cmd_client(char *buff)
-// {
-// 	char	**tab;
-
-// 	tab = ft_strsplit(buff, ' ');
-// 	tab[0] = ft_strtrim(tab[0]);
-// 	if (ft_strncmp(tab[0], "/nick", 5) == 0
-// 		|| ft_strncmp(tab[0], "/join", 5) == 0
-// 		|| ft_strncmp(tab[0], "/who", 4) == 0
-// 		|| ft_strncmp(tab[0], "/msg", 4) == 0
-// 		|| ft_strncmp(tab[0], "/quit", 5) == 0)
-// 		return (1);
-// 	return (0);
-// }
 
 int 	send_mess(int y, int client_socket, t_ncurse *curs, t_info_client *client)
 {
@@ -75,8 +61,19 @@ int 	send_mess(int y, int client_socket, t_ncurse *curs, t_info_client *client)
 	ft_bzero(buff, 1024);
 	if (!wgetstr(curs->win_term, buff))
 	{
-		if (check_cmd(buff))
+		mvwprintw(curs->win_chat, 10, 3, " !!!!!!!!!!!!!!!!!!!!!!!!");
+		if (check_cmd(buff) == 1)
+		{
+			mvwprintw(curs->win_chat, 12, 3, " !!!!!!!!!!!!!!!!!!!!!!!!");
 			env_server(buff, client_socket);
+		
+		}
+		else if (check_cmd(buff) == 2)
+		{
+			client->str = buff;
+			env_server(buff, client_socket);
+			return (0);
+		}
 		else
 		{
 			auth = 1;
@@ -130,12 +127,11 @@ void	exec_cmd_client(char *buff, t_info_client *client, t_ncurse *curs) // finir
 				env = ft_strjoin(env, " ");
 				j++;
 			}
-			// mvwprintw(curs->win_member, 12, 3, "%s", env);
 		}
 	}
 	else if ((tab[1]) && (!tab[2]))
 	{
-		wrefresh(curs->win_member);
+		wclear(curs->win_member);
 		while (tab1[i])
 		{
 			mvwprintw(curs->win_member, y, 3, "%s", tab1[i]);

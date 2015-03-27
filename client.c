@@ -90,6 +90,19 @@ void	cut_list(char *list, t_ncurse *curs)
 	}
 }
 
+void	cmd_connect(int client_socket, struct sockaddr_in server_info, struct hostent *host_server, t_info_client *client)
+{
+
+	char		**buff;
+
+	buff = ft_strsplit(client->str, ' ');
+	host_server = gethostbyname(buff[1]);
+	server_info.sin_port = atoi(buff[2]);
+	server_info.sin_family = AF_INET;
+	client_socket = create_socket(client_socket);
+	connect_server(client_socket, server_info, client, host_server);
+}
+
 void	action(int client_socket, t_info_client *client, struct sockaddr_in server_info, struct hostent *host_server)
 {
 	fd_set			readfds;
@@ -97,8 +110,6 @@ void	action(int client_socket, t_info_client *client, struct sockaddr_in server_
 	int				y;
 	char			buff[1024];
 	char			**msg;
-	(void)host_server;
-	(void)server_info;
 
 	curs = init_curses();
 	y = 0;
@@ -115,19 +126,22 @@ void	action(int client_socket, t_info_client *client, struct sockaddr_in server_
 		else
 		{
 			if (FD_ISSET(0, &readfds))
+			{
 				y = send_mess(y, client_socket, curs, client);
+				if (y == 0)
+				{
+					cmd_connect(client_socket, server_info, host_server, client);
+					mvwprintw(curs->win_chat, 22 + y, 3, "la valeur de y est egale a %d et le buff %s", y, client->str);
+				}
+			}
 	        if (FD_ISSET(client_socket, &readfds))
 	        {
-	        	mvwprintw(curs->win_chat, 10, 3, "%s", buff);
 	        	if (recv(client_socket, &buff, 1024, 0) == -1)
 	        		ft_error_i("Error recv", 4);
 	        	if (first_msg(buff))
 	        		updt_nickname(buff, client);
-				else if (check_cmd_client(buff))
-				{
-					ft_putendl("ca passe!!");
+				else if (check_cmd_client(buff, curs))
 					exec_cmd_client(buff, client, curs);
-				}
 				else
 				{
 					msg = ft_strsplit(buff, '$');

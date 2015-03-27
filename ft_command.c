@@ -13,17 +13,22 @@
 #include "header.h"
 
 
-void	close_and_connect(int client_socket, char *buff, t_lst_member *member)
+t_lst_member *close_client(int client_socket, char *buff, t_lst_member *liste)
 {
-
-	if (send(client_socket, buff, ft_strlen(buff), 0) == -1)
-		ft_error_i("Error to send", 1);
-
-	(void)member;
-	//close(client_socket);
-	RED;
-	ft_putendl("salut");
-	CANCEL;
+    if(liste == NULL)
+        return NULL;
+    if(liste->socket == client_socket)
+    {
+        t_lst_member* tmp = liste->next;
+        free(liste);
+        tmp = close_client(client_socket, buff, tmp);
+        return tmp;
+    }
+    else
+    {
+        liste->next = close_client( client_socket, buff, liste->next);
+        return liste;
+    }
 }
 
 void	exec_cmd_sev(char *buff, int client_socket, t_lst_member *member)
@@ -36,6 +41,12 @@ void	exec_cmd_sev(char *buff, int client_socket, t_lst_member *member)
 		send_member_lst(client_socket, member);
 	else if (ft_strcmp(cut[0], LEAVE) == 0)
 		exit_channel(client_socket, buff, member);
+	else if (strcmp(cut[0], DECO) == 0)
+	{
+		ft_putendl("sa passe ici");
+	 	member = close_client(client_socket, buff, member);
+	 	exit(3);
+	}
 	else
 	{
 		if ((cut[1] = ft_strtrim(cut[1])) != NULL)
@@ -49,7 +60,10 @@ void	exec_cmd_sev(char *buff, int client_socket, t_lst_member *member)
 			else if (strcmp(cut[0], MSG) == 0)
 			 	send_private_msg(client_socket, buff, member);
 			else if (strcmp(cut[0], CO) == 0)
-			 	close_and_connect(client_socket, buff, member);
+			{
+			 	member = close_client(client_socket, buff, member);
+			 	// close(client_socket);
+			}
 		}
 	}
 }
@@ -59,6 +73,7 @@ void	send_member_lst(int client, t_lst_member *member)
 	char	*str;
 
 	str = get_list_member(member);
+	ft_putendl("ici");
 	if (send(client, str, ft_strlen(str), 0) == -1)
 		ft_error_i("Error to send", 1);
 }
